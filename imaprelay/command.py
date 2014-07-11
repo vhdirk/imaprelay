@@ -1,10 +1,17 @@
-import ConfigParser
 import logging
 import os
 import stat
 import sys
+import argparse
 
-from StringIO import StringIO
+try:
+    from ConfigParser import ConfigParser
+except ImportError:
+    from configparser import ConfigParser
+try:
+    from StringIO import StringIO
+except ImportError:
+    from io import StringIO
 
 from . import connection
 from . import relay
@@ -19,20 +26,25 @@ interval=30
 """
 
 def main():
-    if '-v' in sys.argv:
+    parser = argparse.ArgumentParser(prog="imaprelay",
+                                    description="An IMAP-to-SMTP relay, for tedious email services that don't allow forwarding (or suck at it)")
+    parser.add_argument("-v", "--verbose", action='store_true', help="Show debug output")
+    parser.add_argument("-c", "--config", help="Configuration file location", default=os.path.expanduser('~/.secret/imaprelay.cfg'))
+    
+    args = parser.parse_args()
+    
+    if args.verbose:
         log.setLevel(logging.DEBUG)
 
-    configfile = os.path.expanduser('~/.secret/imaprelay.cfg')
-
-    st = os.stat(configfile)
+    st = os.stat(args.config)
     if bool(st.st_mode & (stat.S_IRGRP | stat.S_IROTH)):
         raise Exception("Config file (%s) appears to be group- or "
                         "world-readable. Please `chmod 400` or similar."
-                        % configfile)
+                        % args.config)
 
-    config = ConfigParser.ConfigParser()
+    config = ConfigParser()
     config.readfp(StringIO(DEFAULT_CONFIG))
-    config.read([configfile])
+    config.read([args.config])
 
     connection.configure(config)
 
