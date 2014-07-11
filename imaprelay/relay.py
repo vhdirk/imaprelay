@@ -117,17 +117,17 @@ class Relay(object):
 
         try:
             self.imap.close()
-        except (imaplib.IMAP4.error, AttributeError):
+        except (imaplib.IMAP4.error, AttributeError, OSError):
             pass
 
         try:
             self.imap.logout()
-        except (imaplib.IMAP4.error, AttributeError):
+        except (imaplib.IMAP4.error, AttributeError, OSError):
             pass
 
         try:
             self.smtp.quit()
-        except (smtplib.SMTPServerDisconnected, AttributeError):
+        except (smtplib.SMTPServerDisconnected, AttributeError, OSError):
             pass
 
     def _chk(self, res):
