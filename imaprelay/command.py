@@ -28,13 +28,15 @@ interval=30
 def main():
     parser = argparse.ArgumentParser(prog="imaprelay",
                                     description="An IMAP-to-SMTP relay, for tedious email services that don't allow forwarding (or suck at it)")
-    parser.add_argument("-v", "--verbose", action='store_true', help="Show debug output")
+    parser.add_argument("-v", "--verbose", action='store_true', default=False, help="Show debug output")
     parser.add_argument("-c", "--config", help="Configuration file location", default=os.path.expanduser('~/.secret/imaprelay.cfg'))
     
     args = parser.parse_args()
-    
+
     if args.verbose:
         log.setLevel(logging.DEBUG)
+    else:
+        log.setLevel(logging.CRITICAL)
 
     st = os.stat(args.config)
     if bool(st.st_mode & (stat.S_IRGRP | stat.S_IROTH)):
