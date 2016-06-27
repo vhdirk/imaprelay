@@ -71,8 +71,8 @@ class Relay(object):
 
         for response_part in msg_data:
             if isinstance(response_part, tuple):
-                eml = email.message_from_string(response_part[1].decode("utf-8"))
-                res = self.smtp.sendmail(eml['from'], self.to, eml.as_string())
+                eml = email.message_from_string(response_part[1].decode('ascii', 'ignore'))
+                res = self.smtp.sendmail(eml['from'], self.to, eml.as_string().encode('ascii', 'ignore'))
 
                 log.debug("Sent message '{subj}' from {from_} to {to}".format(from_=eml['from'],
                                                                               to=self.to,
